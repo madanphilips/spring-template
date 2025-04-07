@@ -4,16 +4,20 @@ package com.example.springtemplate.billing.service;
 import com.example.springtemplate.billing.dto.BillingDTO;
 import com.example.springtemplate.billing.entity.Billing;
 import com.example.springtemplate.billing.repository.BillingRepository;
+import com.example.springtemplate.billing.util.BillingValidationUtil;
+import com.example.springtemplate.common.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class BillingService {
 
     private final BillingRepository billingRepository;
+
 
     public BillingService(BillingRepository billingRepository) {
         this.billingRepository = billingRepository;
@@ -41,4 +45,20 @@ public class BillingService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public BillingDTO getBillingByInvoiceNumber(String invoiceNumber) {
+        BillingValidationUtil.validateInvoiceNumberFormat(invoiceNumber);
+
+        Billing billing = billingRepository.findByInvoiceNumber(invoiceNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice number not found: " + invoiceNumber));
+
+
+        BillingDTO dto = new BillingDTO();
+        dto.setInvoiceNumber(billing.getInvoiceNumber());
+        dto.setCustomerName(billing.getCustomerName());
+        dto.setAmount(billing.getAmount());
+        return dto;
+
+    }
+
 }

@@ -3,6 +3,7 @@ package com.example.springtemplate.billing.controller;
 import com.example.springtemplate.billing.dto.BillingDTO;
 import com.example.springtemplate.billing.service.BillingService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,11 @@ public class BillingController {
     @GetMapping
     public List<BillingDTO> findAll() {
         return billingService.findAll();
+    }
+
+    @GetMapping("/{invoiceNumber}")
+    public BillingDTO getBillingByInvoiceNumber(@PathVariable String invoiceNumber) {
+        return billingService.getBillingByInvoiceNumber(invoiceNumber);
     }
 
     @PostMapping

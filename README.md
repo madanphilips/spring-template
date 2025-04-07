@@ -23,7 +23,7 @@ A minimal Spring Boot REST API to manage Invoices in a Billing System.
 - Java 21
 - Spring Boot 3.x
 - Spring Data JPA
-- MySQL
+- MySQL 8.x
 - HikariCP
 - Lombok
 - Maven
@@ -31,6 +31,10 @@ A minimal Spring Boot REST API to manage Invoices in a Billing System.
 
 ---
 
+## SQL Scripts
+Execute the scripts from the `src/main/resources/sql` (in the defined order)
+
+---
 ## API Endpoints
 
 | Method | Endpoint               | Description                        |

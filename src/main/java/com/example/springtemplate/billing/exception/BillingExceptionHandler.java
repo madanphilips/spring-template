@@ -20,4 +20,9 @@ public class BillingExceptionHandler {
         error.put("status", HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    // wrote some new code...
+    // wrote some new code...
+    // wrote some new code...
+
 }

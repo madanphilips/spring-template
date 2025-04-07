@@ -6,6 +6,7 @@ import com.example.springtemplate.billing.entity.Billing;
 import com.example.springtemplate.billing.repository.BillingRepository;
 import com.example.springtemplate.billing.util.BillingValidationUtil;
 import com.example.springtemplate.common.exception.ResourceNotFoundException;
+import com.example.springtemplate.common.util.DateTimeUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,9 @@ public class BillingService {
     }
 
     public BillingDTO create(BillingDTO dto) {
+
+        BillingValidationUtil.validateInvoiceNumberFormat(dto.getInvoiceNumber());
+
         Billing billing = Billing.builder()
                 .invoiceNumber(dto.getInvoiceNumber())
                 .customerName(dto.getCustomerName())
@@ -31,7 +35,9 @@ public class BillingService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        billingRepository.save(billing);
+        Billing savedBilling = billingRepository.save(billing);
+        dto.setDurationSinceCreated(DateTimeUtil.calculateDuration(savedBilling.getCreatedAt()));
+
         return dto;
     }
 
@@ -42,6 +48,7 @@ public class BillingService {
                         .invoiceNumber(b.getInvoiceNumber())
                         .customerName(b.getCustomerName())
                         .amount(b.getAmount())
+                        .durationSinceCreated(DateTimeUtil.calculateDuration(b.getCreatedAt()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -57,6 +64,7 @@ public class BillingService {
         dto.setInvoiceNumber(billing.getInvoiceNumber());
         dto.setCustomerName(billing.getCustomerName());
         dto.setAmount(billing.getAmount());
+        dto.setDurationSinceCreated(DateTimeUtil.calculateDuration(billing.getCreatedAt()));
         return dto;
 
     }

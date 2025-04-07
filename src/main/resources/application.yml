@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: spring-template
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/sample_db
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10        # Max connections in pool
+      minimum-idle: 5              # Minimum idle connections
+      idle-timeout: 30000          # 30 sec
+      max-lifetime: 1800000        # 30 min
+      connection-timeout: 20000    # 20 sec
+      pool-name: HikariCP
+
+  jpa:
+    show-sql: true
+
+server:
+  port: 8080

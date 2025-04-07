@@ -16,4 +16,5 @@ public class BillingDTO {
     private String invoiceNumber;
     private String customerName;
     private Double amount;
+    private String durationSinceCreated;
 }

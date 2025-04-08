@@ -2,12 +2,10 @@ package com.example.springtemplate.billing.controller;
 
 import com.example.springtemplate.billing.dto.BillingDTO;
 import com.example.springtemplate.billing.service.BillingService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.springtemplate.billing.util.BillingValidationUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,6 +14,7 @@ import java.util.List;
 public class BillingController {
 
     private final BillingService billingService;
+
 
     public BillingController(BillingService billingService) {
         this.billingService = billingService;
@@ -26,15 +25,34 @@ public class BillingController {
         return billingService.findAll();
     }
 
+    @PostMapping
+    public BillingDTO create(@RequestBody BillingDTO dto) {
+        return billingService.create(dto);
+    }
+
     @GetMapping("/{invoiceNumber}")
     public BillingDTO getBillingByInvoiceNumber(@PathVariable String invoiceNumber) {
         return billingService.getBillingByInvoiceNumber(invoiceNumber);
     }
 
-    @PostMapping
-    public BillingDTO create(@RequestBody BillingDTO dto) {
-        return billingService.create(dto);
+
+    @PutMapping("/{invoiceNumber}")
+    public BillingDTO update(@PathVariable String invoiceNumber, @RequestBody BillingDTO dto) {
+        return billingService.update(invoiceNumber, dto);
     }
+
+    @DeleteMapping("/{invoiceNumber}")
+    public String delete(@PathVariable String invoiceNumber) {
+        return billingService.delete(invoiceNumber);
+
+    }
+
+//    @DeleteMapping("/{invoiceNumber}")
+//    public String deleteInvoice(@PathVariable String invoiceNumber) {
+//        String result = billingService.delete(invoiceNumber);
+//        return result;  // Return success message
+//    }
+
 
 
 }

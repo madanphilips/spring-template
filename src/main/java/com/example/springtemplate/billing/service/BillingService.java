@@ -9,6 +9,9 @@ import com.example.springtemplate.billing.util.BillingValidationUtil;
 import com.example.springtemplate.common.exception.ResourceNotFoundException;
 import com.example.springtemplate.common.util.DateTimeUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
@@ -49,16 +52,21 @@ public class BillingService {
             billing = billingRepository.findByInvoiceNumber(invoiceNumber)
                     .orElseThrow(() -> new ResourceNotFoundException("Invoice number not found: " + invoiceNumber));
 
-            BillingValidationUtil.validAmount(dto.getAmount());
-
-            BillingValidationUtil.validCustomerName(dto.getCustomerName());
-
-            billing.setAmount(Math.round(dto.getAmount() * 100.0) / 100.0);
-            billing.setCustomerName(dto.getCustomerName());
+            if(dto.getAmount() != null){
+                BillingValidationUtil.validAmount(dto.getAmount());
+                billing.setAmount(Math.round(dto.getAmount() * 100.0) / 100.0);
+            }
+            if(dto.getCustomerName() != null){
+                BillingValidationUtil.validCustomerName(dto.getCustomerName());
+                billing.setCustomerName(dto.getCustomerName());
+            }
         }
 
         Billing savedBilling = billingRepository.save(billing);
         dto.setDurationSinceCreated(DateTimeUtil.calculateDuration(savedBilling.getCreatedAt()));
+        dto.setAmount(savedBilling.getAmount());
+        dto.setCustomerName(savedBilling.getCustomerName());
+        dto.setInvoiceNumber(savedBilling.getInvoiceNumber());
 
         return dto;
     }
@@ -99,6 +107,17 @@ public class BillingService {
 
         billingRepository.deleteById(billing.getId());
         return ResponseEntity.ok("Billing record deleted successfully");        
+    }
+
+    public Page<BillingDTO> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Billing> billings = billingRepository.findAll(pageable);
+        return billings.map(b -> BillingDTO.builder()
+                .invoiceNumber(b.getInvoiceNumber())
+                .customerName(b.getCustomerName())
+                .amount(b.getAmount())
+                .durationSinceCreated(DateTimeUtil.calculateDuration(b.getCreatedAt()))
+                .build());        
     }
 
 }

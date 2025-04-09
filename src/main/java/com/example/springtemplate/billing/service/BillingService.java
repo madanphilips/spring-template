@@ -28,7 +28,7 @@ public class BillingService {
     public BillingDTO create(BillingDTO dto, String invoiceNumber) {
         Billing billing;
         if(invoiceNumber == "") {
-            if(billingRepository.findByInvoiceNumber(dto.getInvoiceNumber()) != null) {
+            if(billingRepository.findByInvoiceNumber(dto.getInvoiceNumber()).isPresent()) {
                 throw new InvalidInvoiceException("Invoice number "+dto.getInvoiceNumber()+" already exists");
             }
 

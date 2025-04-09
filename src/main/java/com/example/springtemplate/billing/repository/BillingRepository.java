@@ -1,11 +1,15 @@
 package com.example.springtemplate.billing.repository;
 
-import com.example.springtemplate.billing.entity.Billing;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.example.springtemplate.billing.entity.Billing;
 
 public interface BillingRepository extends JpaRepository<Billing, Long> {
 
-    Optional<Billing> findByInvoiceNumber(String invoiceNumber);
+    boolean existsByInvoiceNumber(String invoiceNumber);
+
+    Optional<Billing> findByInvoiceNumber(String invoiceNumber);  
+
 }

@@ -3,9 +3,9 @@ spring:
     name: spring-template
 
   datasource:
-    url: jdbc:mysql://localhost:3306/sample_db
+    url: jdbc:mysql://localhost:3306/javacrud
     username: root
-    password: root
+    password: 
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10        # Max connections in pool
@@ -17,6 +17,8 @@ spring:
 
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: update  # This will automatically update the schema
 
 server:
   port: 8080

@@ -15,4 +15,17 @@ public class BillingValidationUtil {
             throw new InvalidInvoiceException("Invalid invoice number format. Expected format: INV-YYYY-SEQ");
         }
     }
+
+
+    public static void validateCustomerName(String customerName) {
+        if (customerName == null || customerName.trim().isEmpty()) {
+            throw new InvalidInvoiceException("Customer name cannot be null or empty");
+        }
+    }
+
+    public static void validateAmount(Double amount) {
+        if (amount == null || amount <= 0) {
+            throw new InvalidInvoiceException("Amount must be greater than zero");
+        }
+    }
 }

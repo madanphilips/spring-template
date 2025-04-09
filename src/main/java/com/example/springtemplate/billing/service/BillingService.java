@@ -3,10 +3,13 @@ package com.example.springtemplate.billing.service;
 
 import com.example.springtemplate.billing.dto.BillingDTO;
 import com.example.springtemplate.billing.entity.Billing;
+import com.example.springtemplate.billing.exception.InvalidInvoiceException;
 import com.example.springtemplate.billing.repository.BillingRepository;
 import com.example.springtemplate.billing.util.BillingValidationUtil;
 import com.example.springtemplate.common.exception.ResourceNotFoundException;
 import com.example.springtemplate.common.util.DateTimeUtil;
+
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,9 +27,15 @@ public class BillingService {
     }
 
     public BillingDTO create(BillingDTO dto) {
-
+        
         BillingValidationUtil.validateInvoiceNumberFormat(dto.getInvoiceNumber());
-
+        BillingValidationUtil.validateCustomerName(dto.getCustomerName());
+        BillingValidationUtil.validateAmount(dto.getAmount());
+    
+        if (billingRepository.findByInvoiceNumber(dto.getInvoiceNumber()).isPresent()) {
+            throw new InvalidInvoiceException("Invoice number already exists: " + dto.getInvoiceNumber());
+        }
+        
         Billing billing = Billing.builder()
                 .invoiceNumber(dto.getInvoiceNumber())
                 .customerName(dto.getCustomerName())
@@ -40,9 +49,14 @@ public class BillingService {
         return dto;
     }
 
-    public List<BillingDTO> findAll() {
-        return billingRepository.findAll()
-                .stream()
+    public List<BillingDTO> findAll(String sortBy, String order) {
+        Sort sort = order.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+    
+        List<Billing> billings = billingRepository.findAll(sort);
+    
+        return billings.stream()
                 .map(b -> BillingDTO.builder()
                         .invoiceNumber(b.getInvoiceNumber())
                         .customerName(b.getCustomerName())
@@ -51,6 +65,7 @@ public class BillingService {
                         .build())
                 .collect(Collectors.toList());
     }
+    
 
     public BillingDTO getBillingByInvoiceNumber(String invoiceNumber) {
         BillingValidationUtil.validateInvoiceNumberFormat(invoiceNumber);
@@ -67,5 +82,35 @@ public class BillingService {
         return dto;
 
     }
+
+    public BillingDTO updateBillingByInvoiceNumber(String invoiceNumber, BillingDTO updateData) {
+        BillingValidationUtil.validateInvoiceNumberFormat(invoiceNumber);
+
+        Billing billing = billingRepository.findByInvoiceNumber(invoiceNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice number not found: " + invoiceNumber));
+    
+        if (updateData.getCustomerName() != null)
+            billing.setCustomerName(updateData.getCustomerName());
+    
+        if (updateData.getAmount() != null)
+            billing.setAmount(updateData.getAmount());
+    
+        Billing updated = billingRepository.save(billing);
+    
+        BillingDTO dto = new BillingDTO();
+        dto.setInvoiceNumber(updated.getInvoiceNumber());
+        dto.setCustomerName(updated.getCustomerName());
+        dto.setAmount(updated.getAmount());
+        dto.setDurationSinceCreated(DateTimeUtil.calculateDuration(updated.getCreatedAt()));
+        return dto;
+    }
+
+    public void deleteByInvoiceNumber(String invoiceNumber) {
+        Billing billing = billingRepository.findByInvoiceNumber(invoiceNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice number not found: " + invoiceNumber));
+        billingRepository.delete(billing);
+    }
+    
+    
 
 }

@@ -2,9 +2,12 @@ package com.example.springtemplate.billing.controller;
 
 import com.example.springtemplate.billing.dto.BillingDTO;
 import com.example.springtemplate.billing.service.BillingService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +36,16 @@ public class BillingController {
 
     @PostMapping
     public BillingDTO create(@RequestBody BillingDTO dto) {
-        return billingService.create(dto);
+        return billingService.create(dto,"");
     }
 
+    @PutMapping("/{invoiceNumber}")
+    public BillingDTO updateBillingByInvoiceNumber(@PathVariable String invoiceNumber, @RequestBody BillingDTO dto) {
+        return billingService.create(dto,invoiceNumber);
+    }
 
+    @DeleteMapping("/{invoiceNumber}")
+    public ResponseEntity<?> deleteBillingByInvoiceNumber(@PathVariable String invoiceNumber) {
+        return billingService.Delete(invoiceNumber);
+    }
 }

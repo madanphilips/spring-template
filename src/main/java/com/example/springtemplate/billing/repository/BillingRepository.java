@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface BillingRepository extends JpaRepository<Billing, Long> {
 
     Optional<Billing> findByInvoiceNumber(String invoiceNumber);
+    boolean existsByInvoiceNumber(String invoiceNumber);
+
 }

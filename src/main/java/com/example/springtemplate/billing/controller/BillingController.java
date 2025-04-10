@@ -1,20 +1,17 @@
 package com.example.springtemplate.billing.controller;
 
 import com.example.springtemplate.billing.dto.BillingDTO;
-import com.example.springtemplate.billing.service.BillingService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.springtemplate.billing.service.ImpServices.BillingService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/billing")
 public class BillingController {
-
+    private static final Logger log = LogManager.getLogger(BillingController.class);
     private final BillingService billingService;
 
     public BillingController(BillingService billingService) {
@@ -22,8 +19,9 @@ public class BillingController {
     }
 
     @GetMapping
-    public List<BillingDTO> findAll() {
-        return billingService.findAll();
+    public List<BillingDTO> findAll(@RequestParam(defaultValue = "customerName") String sortBy, @RequestParam(defaultValue = "asc") String direction) {
+
+        return billingService.findAll( sortBy, direction);
     }
 
     @GetMapping("/{invoiceNumber}")
@@ -36,5 +34,14 @@ public class BillingController {
         return billingService.create(dto);
     }
 
+    @DeleteMapping("/{invoiceNumber}")
+    public String deleteByInvoice(@PathVariable String invoiceNumber){
+         return  billingService.delete(invoiceNumber);
+    }
 
+    @PutMapping("/{invoiceNumber}")
+    public BillingDTO updateByInvoice(@PathVariable String invoiceNumber, @RequestBody BillingDTO dto){
+
+        return billingService.update(invoiceNumber,dto);
+    }
 }
